@@ -1,4 +1,4 @@
-import { mongooseAdapter } from '@payloadcms/db-mongodb'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -24,6 +24,14 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
+  upload: {
+    debug: true,
+    uploadTimeout: 0,
+    useTempFiles: true,
+    limits: {
+      fileSize: 1024 * 1024 * 1024 * 100, // 100GB
+    },
+  },
   collections: [
     {
       slug: 'posts',
@@ -37,8 +45,10 @@ export default buildConfig({
       },
     },
   ],
-  db: mongooseAdapter({
-    url: process.env.DATABASE_URI || '',
+  db: postgresAdapter({
+    pool: {
+      connectionString: process.env.DATABASE_URI || '',
+    },
   }),
   editor: lexicalEditor(),
   email: testEmailAdapter,
